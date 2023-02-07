@@ -31,7 +31,7 @@ export class TextureAtlas implements Disposable {
         }
     }
 
-    addTexture(name: string, texture: Texture) {
+    addTexture(name: string, texture: Texture, normalMap?: Texture) {
         let pages = this.pages;
         let page: TextureAtlasPage = null;
         for (let i = 0; i < pages.length; i++) {
@@ -57,6 +57,7 @@ export class TextureAtlas implements Disposable {
         region.name = name;
         region.page = page;
         region.texture = texture;
+        region.normalMap = normalMap;
         region.index = -1;
         this.regions.push(region);
         return region;

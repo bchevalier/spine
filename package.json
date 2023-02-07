@@ -11,5 +11,8 @@
     "prepublishOnly": "npm run build",
     "test": "cd ./tools/unit-tests && pnpm test && cd ../.."
   },
-  "license": "SEE SPINE-LICENSE"
+  "license": "SEE SPINE-LICENSE",
+  "dependencies": {
+    "rush": "^0.0.2"
+  }
 }

@@ -57,6 +57,7 @@ export enum TextureWrap {
  */
 export class TextureRegion {
     texture: Texture;
+    normalMap: Texture;
 
     //thats for overrides
     size: Rectangle = null;

@@ -1,0 +1,6 @@
+Warning: src/SpineBase.ts:84:1 - (ae-missing-release-tag) "LightEnvironment" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+Warning: src/SpineBase.ts:85:12 - (ae-forgotten-export) The symbol "AmbientLight" needs to be exported by the entry point index.d.ts
+Warning: src/SpineBase.ts:86:12 - (ae-forgotten-export) The symbol "DirectionalLight" needs to be exported by the entry point index.d.ts
+Warning: src/SpineBase.ts:99:5 - (ae-forgotten-export) The symbol "PointLight" needs to be exported by the entry point index.d.ts
+Warning: src/SpineBase.ts:116:1 - (ae-missing-release-tag) "SpineSprite" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+Warning: src/SpineBase.ts:223:14 - (ae-missing-release-tag) "lightEnvironment" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)

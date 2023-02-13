@@ -1,6 +1,6 @@
 import {AttachmentType} from './core/AttachmentType';
 import {TextureRegion} from './core/TextureRegion';
-import {Color, MathUtils} from './core/Utils';
+import {MathUtils} from './core/Utils';
 import type {
     IAnimationState,
     IAnimationStateData
@@ -16,12 +16,14 @@ import type {
 
 import {DRAW_MODES} from '@pixi/constants';
 import {Container, DisplayObject} from '@pixi/display';
-import {Sprite} from '@pixi/sprite';
-import {SimpleMesh} from '@pixi/mesh-extras';
-import {Graphics} from '@pixi/graphics'
+// import {Sprite} from '@pixi/sprite';
+// import {SimpleMesh} from '@pixi/mesh-extras';
+import { SimpleIlluminatedMesh } from './IlluminatedMesh/SimpleIlluminatedMesh';
+import { IlluminatedSprite } from './IlluminatedSprite';
+import {Graphics} from '@pixi/graphics';
 import {Rectangle, Polygon, Transform} from '@pixi/math';
 import {hex2rgb, rgb2hex} from '@pixi/utils';
-import type {Renderer, Texture} from '@pixi/core';
+import type {Texture} from '@pixi/core';
 import {settings} from "./settings";
 import { ISpineDebugRenderer } from './SpineDebugRenderer';
 
@@ -35,167 +37,10 @@ export interface ISpineDisplayObject extends DisplayObject {
     attachment?: IAttachment;
 }
 
-class Point3D {
-    public x: number;
-    public y: number;
-    public z: number;
 
-    constructor() {
-        this.x = 0;
-        this.y = 0;
-        this.z = 0;
-    }
-}
-
-class DirectionalLight {
-    public direction: Point3D;
-    public color: Color;
-    public luminosity: number;
-
-    constructor() {
-        this.direction = new Point3D();
-        this.color = new Color(255, 255, 255);
-        this.luminosity = 1.0;
-    }
-}
-
-class AmbientLight {
-    public color: Color;
-    public luminosity: number;
-
-    constructor() {
-        this.color = new Color(255, 255, 255);
-        this.luminosity = 1.0;
-    }
-}
-
-class PointLight {
-    public position: Point3D;
-    public color: Color;
-    public luminosity: number;
-
-    constructor() {
-        this.position = new Point3D();
-        this.color = new Color(255, 255, 255);
-        this.luminosity = 1.0;
-    }
-}
-
-export class LightEnvironment {
-    public ambientLight: AmbientLight;
-    public directionalLight: DirectionalLight;
-    private pointLights: PointLight[];
-
-    public worldContainer: Container;
-
-    constructor() {
-        this.worldContainer = null;
-
-        this.ambientLight = new AmbientLight();
-        this.directionalLight = new DirectionalLight();
-        this.pointLights = [];
-    }
-
-    getPointLight(index: number) {
-        return this.pointLights[index];
-    }
-
-    public addPointLight() {
-        if (this.pointLights.length >= 4) {
-            console.error('Cannot add more than 4 point lights');
-            return null;
-        }
-
-        const pointLight = new PointLight();
-        this.pointLights.push(pointLight);
-
-        return pointLight;
-    }
-}
-
-export class SpineSprite extends Sprite {
+export class SpineSprite extends IlluminatedSprite {
     region?: TextureRegion = null;
     attachment?: IAttachment = null;
-
-    public _normalMap: Texture;
-    public _lightEnvironment: LightEnvironment;
-    public transformData: Float32Array;
-
-    constructor(
-        texture: Texture,
-        normalMap: Texture,
-        environment: LightEnvironment,
-    ) {
-        super(texture);
-
-        this._lightEnvironment = environment;
-        this._normalMap = normalMap;
-
-        this.transformData = new Float32Array(16);
-        this.pluginName = 'batch-illumination';
-    }
-
-    /**
-     *
-     * Renders the object using the WebGL renderer
-     * @param renderer - The webgl renderer to use.
-     */
-    protected _render(renderer: Renderer): void {
-        this.calculateVertices();
-
-        this.populateTransformData();
-
-        renderer.batch.setObjectRenderer(renderer.plugins[this.pluginName]);
-        renderer.plugins[this.pluginName].render(this);
-    }
-
-    protected populateTransformData() {
-        const wt = this.transform.worldTransform;
-        const a = wt.a;
-        const b = wt.b;
-        const c = wt.c;
-        const d = wt.d;
-
-        const detInv = 1 / (a * d - b * c);
-        const aInv = detInv * d;
-        const bInv = -detInv * b;
-        const cInv = -detInv * c;
-        const dInv = detInv * a;
-
-        // if (Math.random() < 0.001) {
-        //   console.error('a', a)
-        //   console.error('b', b)
-        //   console.error('c', c)
-        //   console.error('d', d)
-        //   console.error('tx', wt.tx)
-        //   console.error('ty', wt.ty)
-
-        //   console.error('aInv', aInv)
-        //   console.error('bInv', bInv)
-        //   console.error('cInv', cInv)
-        //   console.error('dInv', dInv)
-        // }
-
-        this.transformData[0] = aInv;
-        this.transformData[1] = bInv;
-        this.transformData[2] = cInv;
-        this.transformData[3] = dInv;
-
-        this.transformData[4] = aInv;
-        this.transformData[5] = bInv;
-        this.transformData[6] = cInv;
-        this.transformData[7] = dInv;
-
-        this.transformData[8] = aInv;
-        this.transformData[9] = bInv;
-        this.transformData[10] = cInv;
-        this.transformData[11] = dInv;
-
-        this.transformData[12] = aInv;
-        this.transformData[13] = bInv;
-        this.transformData[14] = cInv;
-        this.transformData[15] = dInv;
-    }
 }
 
 
@@ -211,16 +56,14 @@ export class SpineSprite extends Sprite {
 /**
  * @public
  */
-export class SpineMesh extends SimpleMesh implements ISpineDisplayObject {
+export class SpineMesh extends SimpleIlluminatedMesh implements ISpineDisplayObject {
     region?: TextureRegion = null;
     attachment?: IAttachment = null;
 
-    constructor(texture: Texture, vertices?: Float32Array, uvs?: Float32Array, indices?: Uint16Array, drawMode?: number) {
-        super(texture, vertices, uvs, indices, drawMode);
+    constructor(texture: Texture, normalMap: Texture, vertices?: Float32Array, uvs?: Float32Array, invTransform?: Float32Array, indices?: Uint16Array, drawMode?: number) {
+        super(texture, normalMap, vertices, uvs, invTransform, indices, drawMode);
     }
 }
-
-export const lightEnvironment = new LightEnvironment();
 
 /**
  * A class that enables the you to import and run your spine animations in pixi.
@@ -755,8 +598,10 @@ export abstract class SpineBase<Skeleton extends ISkeleton,
         }
         let strip = this.newMesh(
             region ? region.texture : null,
+            region ? region.normalMap : null,
             new Float32Array(attachment.regionUVs.length),
             attachment.regionUVs,
+            new Float32Array(2 * attachment.regionUVs.length),
             new Uint16Array(attachment.triangles),
             DRAW_MODES.TRIANGLES);
 
@@ -909,15 +754,15 @@ export abstract class SpineBase<Skeleton extends ISkeleton,
     }
 
     newSprite(tex: Texture, normalMap: Texture) {
-        return new SpineSprite(tex, normalMap, lightEnvironment);
+        return new SpineSprite(tex, normalMap);
     }
 
     newGraphics() {
         return new Graphics();
     }
 
-    newMesh(texture: Texture, vertices?: Float32Array, uvs?: Float32Array, indices?: Uint16Array, drawMode?: number) {
-        return new SpineMesh(texture, vertices, uvs, indices, drawMode);
+    newMesh(texture: Texture, normalMap: Texture, vertices?: Float32Array, uvs?: Float32Array, invTransform?: Float32Array, indices?: Uint16Array, drawMode?: number) {
+        return new SpineMesh(texture, normalMap, vertices, uvs, invTransform, indices, drawMode);
     }
 
     transformHack() {

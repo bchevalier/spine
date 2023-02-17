@@ -1,6 +1,6 @@
 varying vec2 vTextureCoord;
 varying float vTextureId;
-varying vec4 vTransform;
+varying vec4 vInvTransform;
 varying vec3 vPointLight1Src;
 varying vec3 vPointLight2Src;
 varying vec3 vPointLight3Src;
@@ -28,7 +28,7 @@ void main(void)
     // computing normal
     float nx = normal.r - 0.5;
     float ny = normal.g - 0.5;
-    vec3 n = vec3(vTransform.x * nx - vTransform.z * ny, -vTransform.y * nx + vTransform.w * ny, normal.b);
+    vec3 n = vec3(vInvTransform.x * nx - vInvTransform.z * ny, -vInvTransform.y * nx + vInvTransform.w * ny, normal.b);
 
     // adding directional light
     float dirLightExposure = max(dot(n, dirLightSrc), 0.0);

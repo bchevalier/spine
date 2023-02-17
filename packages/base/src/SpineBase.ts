@@ -26,6 +26,10 @@ import {hex2rgb, rgb2hex} from '@pixi/utils';
 import type {Texture} from '@pixi/core';
 import {settings} from "./settings";
 import { ISpineDebugRenderer } from './SpineDebugRenderer';
+import { lightEnvironment as lighEnv, LightEnvironment as LightEnv } from './LightEnvironment';
+
+export const lightEnvironment = lighEnv;
+export type LightEnvironment = LightEnv;
 
 let tempRgb = [0, 0, 0];
 
@@ -60,8 +64,8 @@ export class SpineMesh extends SimpleIlluminatedMesh implements ISpineDisplayObj
     region?: TextureRegion = null;
     attachment?: IAttachment = null;
 
-    constructor(texture: Texture, normalMap: Texture, vertices?: Float32Array, uvs?: Float32Array, invTransform?: Float32Array, indices?: Uint16Array, drawMode?: number) {
-        super(texture, normalMap, vertices, uvs, invTransform, indices, drawMode);
+    constructor(texture: Texture, normalMap: Texture, vertices?: Float32Array, uvs?: Float32Array, invTransforms?: Float32Array, normalMultipliers?: Float32Array, indices?: Uint16Array, drawMode?: number) {
+        super(texture, normalMap, vertices, uvs, invTransforms, normalMultipliers, indices, drawMode);
     }
 }
 
@@ -602,6 +606,7 @@ export abstract class SpineBase<Skeleton extends ISkeleton,
             new Float32Array(attachment.regionUVs.length),
             attachment.regionUVs,
             new Float32Array(2 * attachment.regionUVs.length),
+            new Float32Array(attachment.regionUVs.length / 2),
             new Uint16Array(attachment.triangles),
             DRAW_MODES.TRIANGLES);
 
@@ -761,8 +766,8 @@ export abstract class SpineBase<Skeleton extends ISkeleton,
         return new Graphics();
     }
 
-    newMesh(texture: Texture, normalMap: Texture, vertices?: Float32Array, uvs?: Float32Array, invTransform?: Float32Array, indices?: Uint16Array, drawMode?: number) {
-        return new SpineMesh(texture, normalMap, vertices, uvs, invTransform, indices, drawMode);
+    newMesh(texture: Texture, normalMap: Texture, vertices?: Float32Array, uvs?: Float32Array, invTransforms?: Float32Array, normalMultipliers?: Float32Array, indices?: Uint16Array, drawMode?: number) {
+        return new SpineMesh(texture, normalMap, vertices, uvs, invTransforms, normalMultipliers, indices, drawMode);
     }
 
     transformHack() {

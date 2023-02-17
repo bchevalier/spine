@@ -1,5 +1,6 @@
 attribute vec2 aVertexPosition;
 attribute vec2 aTextureCoord;
+attribute vec4 aInvTransform;
 
 uniform mat3 projectionMatrix;
 uniform mat3 translationMatrix;
@@ -13,7 +14,7 @@ uniform vec3 pointLight4Src;
 
 varying vec2 vTextureCoord;
 
-varying vec4 vTransform;
+varying vec4 vInvTransform;
 varying vec3 vPointLight1Src;
 varying vec3 vPointLight2Src;
 varying vec3 vPointLight3Src;
@@ -26,9 +27,9 @@ void main(void)
     vTextureCoord = (uTextureMatrix * vec3(aTextureCoord, 1.0)).xy;
 
     // heuristic to determine the scale of the sprite
-    float scale = 2.0 / (length(aTransform.xy) + length(aTransform.zw));
+    float scale = 2.0 / (length(aInvTransform.xy) + length(aInvTransform.zw));
 
-    vTransform = scale * aTransform;
+    vInvTransform = scale * aInvTransform;
 
     vec2 pointLight1Pos = worldScale * vec2(pointLight1Src.x - aVertexPosition.x, aVertexPosition.y - pointLight1Src.y);
     vPointLight1Src = vec3(pointLight1Pos.xy, pointLight1Src.z);

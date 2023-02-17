@@ -37,18 +37,20 @@ export class IlluminatedMeshGeometry extends Geometry
      * @param {Float32Array|number[]} [invTransform] - Inverse transform.
      * @param {Uint16Array|number[]} [index] - IndexBuffer
      */
-    constructor(vertices?: IArrayBuffer, uvs?: IArrayBuffer, invTransform?: IArrayBuffer, index?: IArrayBuffer)
+    constructor(vertices?: IArrayBuffer, uvs?: IArrayBuffer, invTransform?: IArrayBuffer, normalMultiplier?: IArrayBuffer, index?: IArrayBuffer)
     {
         super();
 
         const verticesBuffer = new Buffer(vertices);
         const uvsBuffer = new Buffer(uvs, true);
         const invTransformBuffer = new Buffer(invTransform);
+        const normalMultiplierBuffer = new Buffer(normalMultiplier);
         const indexBuffer = new Buffer(index, true, true);
 
         this.addAttribute('aVertexPosition', verticesBuffer, 2, false, TYPES.FLOAT)
             .addAttribute('aTextureCoord', uvsBuffer, 2, false, TYPES.FLOAT)
-            .addAttribute('aTransform', invTransformBuffer, 4, false, TYPES.FLOAT)
+            .addAttribute('aInvTransform', invTransformBuffer, 4, false, TYPES.FLOAT)
+            .addAttribute('aNormalMultiplier', normalMultiplierBuffer, 1, false, TYPES.FLOAT)
             .addIndex(indexBuffer);
 
         this._updateId = -1;

@@ -21,6 +21,7 @@ export class SimpleIlluminatedMesh extends IlluminatedMesh
      * @param {Float32Array} [vertices] - if you want to specify the vertices
      * @param {Float32Array} [uvs] - if you want to specify the uvs
      * @param {Float32Array} [invTransform] - if you want to specify the inverse transform
+     * @param {Float32Array} [normalMultiplier] - if you want to specify the normal multiplier
      * @param {Uint16Array} [indices] - if you want to specify the indices
      * @param drawMode - the drawMode, can be any of the Mesh.DRAW_MODES consts
      */
@@ -30,13 +31,16 @@ export class SimpleIlluminatedMesh extends IlluminatedMesh
         vertices?: IArrayBuffer,
         uvs?: IArrayBuffer,
         invTransform?: IArrayBuffer,
+        normalMultiplier?: IArrayBuffer,
         indices?: IArrayBuffer,
         drawMode?: DRAW_MODES
     )
     {
-        const geometry = new IlluminatedMeshGeometry(vertices, uvs, invTransform, indices);
+        const geometry = new IlluminatedMeshGeometry(vertices, uvs, invTransform, normalMultiplier, indices);
 
         geometry.getBuffer('aVertexPosition').static = false;
+        geometry.getBuffer('aInvTransform').static = false;
+        geometry.getBuffer('aNormalMultiplier').static = false;
 
         const meshMaterial = new IlluminatedMeshMaterial(texture, normalMap);
 
@@ -59,16 +63,29 @@ export class SimpleIlluminatedMesh extends IlluminatedMesh
     }
 
     /**
-     * Collection of vertices data.
+     * Collection of inverse transforms
      * @type {Float32Array}
      */
-    get invTransform(): ITypedArray
+    get invTransforms(): ITypedArray
     {
-        return this.geometry.getBuffer('aTransform').data;
+        return this.geometry.getBuffer('aInvTransform').data;
     }
-    set invTransform(value: ITypedArray)
+    set invTransforms(value: ITypedArray)
     {
-        this.geometry.getBuffer('aTransform').data = value;
+        this.geometry.getBuffer('aInvTransform').data = value;
+    }
+
+    /**
+     * Collection of normal multipliers
+     * @type {Float32Array}
+     */
+    get normalMultipliers(): ITypedArray
+    {
+        return this.geometry.getBuffer('aNormalMultiplier').data;
+    }
+    set normalMultipliers(value: ITypedArray)
+    {
+        this.geometry.getBuffer('aNormalMultiplier').data = value;
     }
 
     _render(renderer: Renderer): void
@@ -76,7 +93,8 @@ export class SimpleIlluminatedMesh extends IlluminatedMesh
         if (this.autoUpdate)
         {
             this.geometry.getBuffer('aVertexPosition').update();
-            this.geometry.getBuffer('aTransform').update();
+            this.geometry.getBuffer('aInvTransform').update();
+            this.geometry.getBuffer('aNormalMultiplier').update();
         }
 
         super._render(renderer);

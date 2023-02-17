@@ -80,7 +80,7 @@ export class IlluminatedMeshMaterial extends Shader
         options = Object.assign({
             tint: 0xFFFFFF,
             alpha: 1,
-            pluginName: 'batchIlluminated',
+            pluginName: 'batchIllumination',
         }, options);
 
         if (options.uniforms)
@@ -95,6 +95,10 @@ export class IlluminatedMeshMaterial extends Shader
         this.uvMatrix = new TextureMatrix(texture);
         this.batchable = options.program === undefined;
         this.pluginName = options.pluginName;
+    }
+
+    get lightEnvironment(): LightEnvironment {
+        return this._lightEnvironment;
     }
 
     /** Reference to the texture being rendered. */

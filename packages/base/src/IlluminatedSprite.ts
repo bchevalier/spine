@@ -1,4 +1,4 @@
-import { Renderer, Texture } from "@pixi/core";
+import { Texture } from "@pixi/core";
 import { Sprite } from "@pixi/sprite";
 import { lightEnvironment, LightEnvironment } from "./LightEnvironment";
 
@@ -6,7 +6,8 @@ export class IlluminatedSprite extends Sprite {
 
     public _normalMap: Texture;
     public _lightEnvironment: LightEnvironment;
-    public transformData: Float32Array;
+    public invTransformData: Float32Array;
+    public normalMultiplierData: Float32Array;
 
     constructor(
         texture: Texture,
@@ -17,20 +18,10 @@ export class IlluminatedSprite extends Sprite {
         this._lightEnvironment = lightEnvironment;
         this._normalMap = normalMap;
 
-        this.transformData = new Float32Array(16);
+        this.invTransformData = new Float32Array(16);
+        this.normalMultiplierData = new Float32Array(4);
+
         this.pluginName = 'batchIllumination';
-    }
-
-    /**
-     *
-     * Renders the object using the WebGL renderer
-     * @param renderer - The webgl renderer to use.
-     */
-    protected _render(renderer: Renderer): void {
-        this.calculateVertices();
-
-        renderer.batch.setObjectRenderer(renderer.plugins[this.pluginName]);
-        renderer.plugins[this.pluginName].render(this);
     }
 
     public calculateVertices() {
@@ -48,24 +39,29 @@ export class IlluminatedSprite extends Sprite {
         const cInv = -detInv * c;
         const dInv = detInv * a;
 
-        this.transformData[0] = aInv;
-        this.transformData[1] = bInv;
-        this.transformData[2] = cInv;
-        this.transformData[3] = dInv;
+        this.invTransformData[0] = aInv;
+        this.invTransformData[1] = bInv;
+        this.invTransformData[2] = cInv;
+        this.invTransformData[3] = dInv;
 
-        this.transformData[4] = aInv;
-        this.transformData[5] = bInv;
-        this.transformData[6] = cInv;
-        this.transformData[7] = dInv;
+        this.invTransformData[4] = aInv;
+        this.invTransformData[5] = bInv;
+        this.invTransformData[6] = cInv;
+        this.invTransformData[7] = dInv;
 
-        this.transformData[8] = aInv;
-        this.transformData[9] = bInv;
-        this.transformData[10] = cInv;
-        this.transformData[11] = dInv;
+        this.invTransformData[8] = aInv;
+        this.invTransformData[9] = bInv;
+        this.invTransformData[10] = cInv;
+        this.invTransformData[11] = dInv;
 
-        this.transformData[12] = aInv;
-        this.transformData[13] = bInv;
-        this.transformData[14] = cInv;
-        this.transformData[15] = dInv;
+        this.invTransformData[12] = aInv;
+        this.invTransformData[13] = bInv;
+        this.invTransformData[14] = cInv;
+        this.invTransformData[15] = dInv;
+
+        this.normalMultiplierData[0] = 1;
+        this.normalMultiplierData[1] = 1;
+        this.normalMultiplierData[2] = 1;
+        this.normalMultiplierData[3] = 1;
     }
 }

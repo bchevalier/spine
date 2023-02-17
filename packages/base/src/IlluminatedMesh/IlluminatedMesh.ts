@@ -1,6 +1,7 @@
 import { DRAW_MODES } from '@pixi/constants';
-import { State } from '@pixi/core';
+import { Renderer, State, Texture } from '@pixi/core';
 import { Mesh } from '@pixi/mesh';
+import { LightEnvironment } from '../LightEnvironment';
 import { IlluminatedMeshGeometry } from './IlluminatedMeshGeometry';
 import { IlluminatedMeshMaterial } from './IlluminatedMeshMaterial';
 
@@ -11,33 +12,37 @@ import { IlluminatedMeshMaterial } from './IlluminatedMeshMaterial';
  */
 export class IlluminatedMesh extends Mesh<IlluminatedMeshMaterial>
 {
+    public _normalMap: Texture;
+    public _lightEnvironment: LightEnvironment;
+
     public invTransformData: Float32Array;
-    private invTransformDirty: number;
+    public normalMultiplierData: Float32Array;
 
     constructor(geometry: IlluminatedMeshGeometry, shader: IlluminatedMeshMaterial, state?: State, drawMode: DRAW_MODES = DRAW_MODES.TRIANGLES)
     {
        super(geometry, shader, state, drawMode);
 
-       this.invTransformDirty = 0;
        this.invTransformData = new Float32Array(1);
+       this.normalMultiplierData = new Float32Array(1);
+    }
+
+    _renderToBatch(renderer: Renderer) {
+        this._normalMap = this.shader.normalMap;
+        this._lightEnvironment = this.shader.lightEnvironment;
+
+        super._renderToBatch(renderer);
     }
 
     calculateVertices() {
         super.calculateVertices();
 
         const geometry = this.geometry;
+
         const invTransformBuffer = geometry.buffers[2];
-        const vertices = invTransformBuffer.data;
-
-        const invTransformDirtyId = invTransformBuffer._updateID;
-        if (invTransformDirtyId === this.invTransformDirty)
+        const invTransforms = invTransformBuffer.data;
+        if (this.invTransformData.length !== invTransforms.length)
         {
-            return;
-        }
-
-        if (this.invTransformData.length !== vertices.length)
-        {
-            this.invTransformData = new Float32Array(vertices.length);
+            this.invTransformData = new Float32Array(invTransforms.length);
         }
 
         const wt = this.transform.worldTransform;
@@ -53,14 +58,26 @@ export class IlluminatedMesh extends Mesh<IlluminatedMeshMaterial>
         const dInv = detInv * a;
 
         const invTransformData = this.invTransformData;
-        for (let i = 0; i < invTransformData.length / 2; i++)
+        for (let i = 0; i < invTransformData.length / 4; i++)
         {
-            invTransformData[(i * 2)] = aInv;
-            invTransformData[(i * 2) + 1] = bInv;
-            invTransformData[(i * 2) + 2] = cInv;
-            invTransformData[(i * 2) + 3] = dInv;
+            invTransformData[(i * 4)] = aInv;
+            invTransformData[(i * 4) + 1] = bInv;
+            invTransformData[(i * 4) + 2] = cInv;
+            invTransformData[(i * 4) + 3] = dInv;
         }
 
-        this.invTransformDirty = invTransformDirtyId;
+        const normalMultiplierBuffer = geometry.buffers[3];
+        const normalMultipliers = normalMultiplierBuffer.data;
+        if (this.normalMultiplierData.length !== normalMultipliers.length)
+        {
+            this.normalMultiplierData = new Float32Array(normalMultipliers.length);
+        }
+
+        // TODO: check here what should be the multiplier for each vertex!
+        const normalMultiplierData = this.normalMultiplierData;
+        for (let i = 0; i < normalMultiplierData.length; i++)
+        {
+            normalMultiplierData[i] = 1;
+        }
     }
 }

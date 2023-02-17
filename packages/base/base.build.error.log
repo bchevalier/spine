@@ -1,13 +1,6 @@
-[!] Error: Multiple conflicting contents for sourcemap source /Users/bricechevalier/Documents/projects/spine/packages/base/src/SpineBase.ts
-Error: Multiple conflicting contents for sourcemap source /Users/bricechevalier/Documents/projects/spine/packages/base/src/SpineBase.ts
-    at error (/Users/bricechevalier/Documents/projects/spine/common/temp/node_modules/.pnpm/registry.npmjs.org/rollup/2.79.1/node_modules/rollup/dist/shared/rollup.js:198:30)
-    at Link.traceMappings (/Users/bricechevalier/Documents/projects/spine/common/temp/node_modules/.pnpm/registry.npmjs.org/rollup/2.79.1/node_modules/rollup/dist/shared/rollup.js:14072:32)
-    at collapseSourcemaps (/Users/bricechevalier/Documents/projects/spine/common/temp/node_modules/.pnpm/registry.npmjs.org/rollup/2.79.1/node_modules/rollup/dist/shared/rollup.js:14165:63)
-    at Chunk.render (/Users/bricechevalier/Documents/projects/spine/common/temp/node_modules/.pnpm/registry.npmjs.org/rollup/2.79.1/node_modules/rollup/dist/shared/rollup.js:15061:19)
-    at /Users/bricechevalier/Documents/projects/spine/common/temp/node_modules/.pnpm/registry.npmjs.org/rollup/2.79.1/node_modules/rollup/dist/shared/rollup.js:15943:40
-    at async Promise.all (index 0)
-    at Bundle.addFinalizedChunksToBundle (/Users/bricechevalier/Documents/projects/spine/common/temp/node_modules/.pnpm/registry.npmjs.org/rollup/2.79.1/node_modules/rollup/dist/shared/rollup.js:15941:9)
-    at Bundle.generate (/Users/bricechevalier/Documents/projects/spine/common/temp/node_modules/.pnpm/registry.npmjs.org/rollup/2.79.1/node_modules/rollup/dist/shared/rollup.js:15921:13)
-    at /Users/bricechevalier/Documents/projects/spine/common/temp/node_modules/.pnpm/registry.npmjs.org/rollup/2.79.1/node_modules/rollup/dist/shared/rollup.js:23833:27
-    at catchUnfinishedHookActions (/Users/bricechevalier/Documents/projects/spine/common/temp/node_modules/.pnpm/registry.npmjs.org/rollup/2.79.1/node_modules/rollup/dist/shared/rollup.js:23247:20)
-
+Warning: src/SpineBase.ts:31:14 - (ae-missing-release-tag) "lightEnvironment" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+Warning: src/SpineBase.ts:32:1 - (ae-forgotten-export) The symbol "LightEnvironment" needs to be exported by the entry point index.d.ts
+Warning: src/SpineBase.ts:32:1 - (ae-missing-release-tag) "LightEnvironment" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+Warning: src/SpineBase.ts:45:1 - (ae-forgotten-export) The symbol "IlluminatedSprite" needs to be exported by the entry point index.d.ts
+Warning: src/SpineBase.ts:45:1 - (ae-missing-release-tag) "SpineSprite" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+Warning: src/SpineBase.ts:63:1 - (ae-forgotten-export) The symbol "SimpleIlluminatedMesh" needs to be exported by the entry point index.d.ts

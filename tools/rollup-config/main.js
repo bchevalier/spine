@@ -21,7 +21,7 @@ const pkgAuthor = pkg.author;
 
 exports.main = function main(options) {
     options = Object.assign({
-        sourcemap: true,
+        sourcemap: false,
         globals: {},
         production: false,
     }, options);

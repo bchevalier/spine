@@ -16,20 +16,14 @@ import type {
 
 import {DRAW_MODES} from '@pixi/constants';
 import {Container, DisplayObject} from '@pixi/display';
-// import {Sprite} from '@pixi/sprite';
-// import {SimpleMesh} from '@pixi/mesh-extras';
-import { SimpleIlluminatedMesh } from './IlluminatedMesh/SimpleIlluminatedMesh';
-import { IlluminatedSprite } from './IlluminatedSprite';
+import {Sprite} from '@pixi/sprite';
+import {SimpleMesh} from '@pixi/mesh-extras';
 import {Graphics} from '@pixi/graphics';
 import {Rectangle, Polygon, Transform} from '@pixi/math';
 import {hex2rgb, rgb2hex} from '@pixi/utils';
 import type {Texture} from '@pixi/core';
 import {settings} from "./settings";
 import { ISpineDebugRenderer } from './SpineDebugRenderer';
-import { lightEnvironment as lighEnv, LightEnvironment as LightEnv } from './LightEnvironment';
-
-export const lightEnvironment = lighEnv;
-export type LightEnvironment = LightEnv;
 
 let tempRgb = [0, 0, 0];
 
@@ -42,9 +36,10 @@ export interface ISpineDisplayObject extends DisplayObject {
 }
 
 
-export class SpineSprite extends IlluminatedSprite {
+export class SpineSprite extends Sprite {
     region?: TextureRegion = null;
     attachment?: IAttachment = null;
+    spineAnimation?: SpineBase<ISkeleton, ISkeletonData, IAnimationState, IAnimationStateData> = null;
 }
 
 
@@ -60,13 +55,18 @@ export class SpineSprite extends IlluminatedSprite {
 /**
  * @public
  */
-export class SpineMesh extends SimpleIlluminatedMesh implements ISpineDisplayObject {
+export class SpineMesh extends SimpleMesh implements ISpineDisplayObject {
     region?: TextureRegion = null;
     attachment?: IAttachment = null;
+    spineAnimation?: SpineBase<ISkeleton, ISkeletonData, IAnimationState, IAnimationStateData> = null;
+}
 
-    constructor(texture: Texture, normalMap: Texture, vertices?: Float32Array, uvs?: Float32Array, invTransforms?: Float32Array, normalMultipliers?: Float32Array, indices?: Uint16Array, drawMode?: number) {
-        super(texture, normalMap, vertices, uvs, invTransforms, normalMultipliers, indices, drawMode);
-    }
+export interface SpineSpriteConstructor {
+    new (texture?: Texture): SpineSprite;
+}
+
+export interface SpineMeshConstructor {
+    new (texture: Texture, vertices?: Float32Array, uvs?: Float32Array, indices?: Uint16Array, drawMode?: number): SpineMesh;
 }
 
 /**
@@ -112,10 +112,12 @@ export abstract class SpineBase<Skeleton extends ISkeleton,
         this._debug = value;
     }
 
+    private SpriteCtor: SpineSpriteConstructor;
+    private MeshCtor: SpineMeshConstructor;
 
     abstract createSkeleton(spineData: ISkeletonData);
 
-    constructor(spineData: SkeletonData) {
+    constructor(spineData: SkeletonData, SpriteCtor?: SpineSpriteConstructor, MeshCtor?: SpineMeshConstructor) {
         super();
 
         if (!spineData) {
@@ -125,6 +127,9 @@ export abstract class SpineBase<Skeleton extends ISkeleton,
         if ((typeof spineData) === "string") {
             throw new Error('spineData param cant be string. Please use spine.Spine.fromAtlas("YOUR_RESOURCE_NAME") from now on.');
         }
+
+        this.SpriteCtor = SpriteCtor || SpineSprite;
+        this.MeshCtor = MeshCtor || SpineMesh;
 
         /**
          * The spineData object
@@ -574,8 +579,9 @@ export abstract class SpineBase<Skeleton extends ISkeleton,
             region = slot.hackRegion;
         }
         let texture = region ? region.texture : null;
-        let normalMap = region ? region.normalMap : null;
-        let sprite = this.newSprite(texture, normalMap);
+        let sprite = this.newSprite(texture);
+
+        sprite.spineAnimation = this;
 
         sprite.anchor.set(0.5);
         if (region) {
@@ -602,13 +608,12 @@ export abstract class SpineBase<Skeleton extends ISkeleton,
         }
         let strip = this.newMesh(
             region ? region.texture : null,
-            region ? region.normalMap : null,
             new Float32Array(attachment.regionUVs.length),
             attachment.regionUVs,
-            new Float32Array(2 * attachment.regionUVs.length),
-            new Float32Array(attachment.regionUVs.length / 2),
             new Uint16Array(attachment.triangles),
             DRAW_MODES.TRIANGLES);
+
+        strip.spineAnimation = this;
 
         if (typeof (strip as any)._canvasPadding !== "undefined") {
             (strip as any)._canvasPadding = 1.5;
@@ -758,16 +763,16 @@ export abstract class SpineBase<Skeleton extends ISkeleton,
         return new Container();
     }
 
-    newSprite(tex: Texture, normalMap: Texture) {
-        return new SpineSprite(tex, normalMap);
+    newSprite(tex: Texture) {
+        return new this.SpriteCtor(tex);
     }
 
     newGraphics() {
         return new Graphics();
     }
 
-    newMesh(texture: Texture, normalMap: Texture, vertices?: Float32Array, uvs?: Float32Array, invTransforms?: Float32Array, normalMultipliers?: Float32Array, indices?: Uint16Array, drawMode?: number) {
-        return new SpineMesh(texture, normalMap, vertices, uvs, invTransforms, normalMultipliers, indices, drawMode);
+    newMesh(texture: Texture, vertices?: Float32Array, uvs?: Float32Array, indices?: Uint16Array, drawMode?: number) {
+        return new this.MeshCtor(texture, vertices, uvs, indices, drawMode);
     }
 
     transformHack() {

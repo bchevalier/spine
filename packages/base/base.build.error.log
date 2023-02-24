@@ -1,6 +1,3 @@
-Warning: src/SpineBase.ts:31:14 - (ae-missing-release-tag) "lightEnvironment" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-Warning: src/SpineBase.ts:32:1 - (ae-forgotten-export) The symbol "LightEnvironment" needs to be exported by the entry point index.d.ts
-Warning: src/SpineBase.ts:32:1 - (ae-missing-release-tag) "LightEnvironment" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-Warning: src/SpineBase.ts:45:1 - (ae-forgotten-export) The symbol "IlluminatedSprite" needs to be exported by the entry point index.d.ts
-Warning: src/SpineBase.ts:45:1 - (ae-missing-release-tag) "SpineSprite" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
-Warning: src/SpineBase.ts:63:1 - (ae-forgotten-export) The symbol "SimpleIlluminatedMesh" needs to be exported by the entry point index.d.ts
+Warning: src/SpineBase.ts:39:1 - (ae-missing-release-tag) "SpineSprite" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+Warning: src/SpineBase.ts:64:1 - (ae-missing-release-tag) "SpineSpriteConstructor" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
+Warning: src/SpineBase.ts:68:1 - (ae-missing-release-tag) "SpineMeshConstructor" is exported by the package, but it is missing a release tag (@alpha, @beta, @public, or @internal)
